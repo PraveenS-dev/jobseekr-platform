@@ -17,13 +17,13 @@ Route::middleware('api')->group(function () {
     Route::post('/users/userNameUnique', [UserController::class, 'userNameUnique']);
     Route::post('/users/{id}/public-key', [UserController::class, 'storePublicKey']);
     Route::get('/users/{id}/public-key', [UserController::class, 'getPublicKey']);
+    Route::get('/jobs/list', [JobController::class, 'list']);
 
     Route::middleware('jwt.auth')->group(function () {
         Route::get('/user',   [AuthController::class, 'me']);
         Route::post('/logout', [AuthController::class, 'logout']);
 
         // Job Seekers
-        Route::get('/jobs/list', [JobController::class, 'list']);
         Route::post('/jobs/store', [JobController::class, 'store']);
         Route::get('/jobs/view/{id}', [JobController::class, 'view']);
         
