@@ -93,11 +93,25 @@ function Register() {
                     <input
                         type="email"
                         placeholder="Email"
-                        {...register("email", { required: "Email is required" })}
+                        {...register("email", {
+                            required: "Email is required",
+                            validate: async (value) => {
+                                try {
+                                    const res = await api.post("/users/emailUnique", { email: value });
+                                    if (res.data.data.existValue === false) {
+                                        return "Email already taken";
+                                    }
+                                    return true;
+                                } catch (err) {
+                                    return "Error checking email";
+                                }
+                            }
+                        })}
                         className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:ring focus:ring-blue-200 focus:outline-none"
                     />
                     {errors.email && <p className="text-red-500 text-sm">{errors.email.message}</p>}
                 </div>
+
 
                 {/* Password */}
                 <div className="space-y-1 text-left">

@@ -7,9 +7,8 @@ import { useAuth } from "../../contexts/AuthContext";
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 
-
 function EmployerRegister() {
-    const { register, handleSubmit, formState: { errors }, trigger, watch } = useForm({ mode: 'onChange' });
+    const { register, handleSubmit, formState: { errors }, trigger, watch, setError, clearErrors } = useForm({ mode: 'onChange' });
     const [step, setStep] = useState(1);
     const [status, setStatus] = useState({ step1: 'default', step2: 'default' });
     const { setUser } = useAuth();
@@ -17,7 +16,6 @@ function EmployerRegister() {
 
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-
 
     const nextStep = async () => {
         const valid = await trigger(['comp_name', 'comp_email', 'comp_ph', 'comp_reg_no', 'comp_address']);
@@ -34,6 +32,7 @@ function EmployerRegister() {
     const onSubmit = async (data) => {
         try {
             setStatus(prev => ({ ...prev, step2: 'valid' }));
+
             const formData = new FormData();
             formData.append('comp_name', data.comp_name);
             formData.append('comp_email', data.comp_email);
@@ -46,9 +45,10 @@ function EmployerRegister() {
             const res = await api.post("/register", {
                 name: data.name,
                 email: data.email,
+                username: data.username,
                 password: data.password,
                 comp_id: company.data.data._id,
-                role: 3
+                role: "3"
             });
 
             localStorage.setItem("token", res.data.access_token);
@@ -57,6 +57,11 @@ function EmployerRegister() {
 
         } catch (err) {
             console.error(err);
+
+            if (err.response?.data?.field && err.response?.data?.message) {
+                setError(err.response.data.field, { type: 'manual', message: err.response.data.message });
+            }
+
             setStatus(prev => ({ ...prev, step2: 'invalid' }));
         }
     };
@@ -92,17 +97,67 @@ function EmployerRegister() {
                             <h2 className="text-xl font-semibold text-gray-800 dark:text-white">Company Details</h2>
 
                             {[
-                                { label: "Company Name", name: "comp_name" },
-                                { label: "Company Email", name: "comp_email", type: "email" },
-                                { label: "Company Contact No", name: "comp_ph" },
-                                { label: "Company Reg No", name: "comp_reg_no" }
+                                {
+                                    label: "Company Name",
+                                    name: "comp_name"
+                                },
+                                {
+                                    label: "Company Email",
+                                    name: "comp_email",
+                                    type: "email",
+                                    validate: async (value) => {
+                                        try {
+                                            const res = await axios.post(`${import.meta.env.VITE_NODE_BASE_URL}/company/emailUnique`, { comp_email: value });
+                                            if (res.data?.data?.existValue === true) {
+                                                return "Email already exists";
+                                            }
+                                            return true;
+                                        } catch {
+                                            return "Error validating email";
+                                        }
+                                    }
+                                },
+                                {
+                                    label: "Company Contact No",
+                                    name: "comp_ph",
+                                    validate: async (value) => {
+                                        try {
+                                            const res = await axios.post(`${import.meta.env.VITE_NODE_BASE_URL}/company/phUnique`, { comp_ph: value });
+                                            if (res.data?.data?.existValue === true) {
+                                                return "Phone number already exists";
+                                            }
+                                            return true;
+                                        } catch {
+                                            return "Error validating phone number";
+                                        }
+                                    }
+                                },
+                                {
+                                    label: "Company Reg No",
+                                    name: "comp_reg_no",
+                                    validate: async (value) => {
+                                        try {
+                                            const res = await axios.post(`${import.meta.env.VITE_NODE_BASE_URL}/company/regNoUnique`, { comp_reg_no: value });
+
+                                            if (res.data?.existValue === true) {
+                                                return "Register number already exists";
+                                            }
+                                            return true;
+                                        } catch {
+                                            return "Error validating registration number";
+                                        }
+                                    }
+                                }
                             ].map(field => (
                                 <div key={field.name} className="space-y-1 text-left">
                                     <label className="block font-semibold text-gray-700 dark:text-gray-200">{field.label}</label>
                                     <input
                                         type={field.type || 'text'}
                                         placeholder={field.label}
-                                        {...register(field.name, { required: `${field.label} is required!` })}
+                                        {...register(field.name, {
+                                            required: `${field.label} is required!`,
+                                            ...(field.validate && { validate: field.validate })
+                                        })}
                                         className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:ring focus:ring-blue-200 focus:outline-none"
                                     />
                                     {errors[field.name] && <p className="text-red-400 text-sm">{errors[field.name].message}</p>}
@@ -129,6 +184,7 @@ function EmployerRegister() {
                         </motion.div>
                     )}
 
+
                     {step === 2 && (
                         <motion.div
                             key="step2"
@@ -143,20 +199,61 @@ function EmployerRegister() {
 
                             {[
                                 { label: "Name", name: "name" },
-                                { label: "Email", name: "email", type: "email" }
+                                {
+                                    label: "Email", name: "email", type: "email", validate: async (value) => {
+                                        try {
+                                            const res = await api.post("/users/emailUnique", { email: value });
+                                            if (res.data.data.existValue === false) {
+                                                return "Email already taken";
+                                            }
+                                            return true;
+                                        } catch (err) {
+                                            return "Error checking email";
+                                        }
+                                    }
+                                },
                             ].map(field => (
                                 <div key={field.name} className="space-y-1 text-left">
                                     <label className="block font-semibold text-gray-700 dark:text-gray-200">{field.label}</label>
                                     <input
                                         type={field.type || 'text'}
                                         placeholder={field.label}
-                                        {...register(field.name, { required: `${field.label} is required!` })}
+                                        {...register(field.name, {
+                                            required: `${field.label} is required!`,
+                                            ...(field.validate && { validate: field.validate })
+                                        })}
                                         className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:ring focus:ring-blue-200 focus:outline-none"
                                     />
                                     {errors[field.name] && <p className="text-red-400 text-sm">{errors[field.name].message}</p>}
                                 </div>
                             ))}
 
+                            {/* Username */}
+                            <div className="space-y-1 text-left">
+                                <label className="block font-semibold text-gray-700 dark:text-gray-200">Username</label>
+                                <input
+                                    type="text"
+                                    placeholder="Username"
+                                    {...register("username", {
+                                        required: "Username is required",
+                                        validate: async (value) => {
+                                            try {
+                                                const res = await api.post("/users/userNameUnique", { username: value });
+                                                if (res.data.data.existValue === false) {
+                                                    return "Username already taken";
+                                                }
+                                                return true;
+                                            } catch (err) {
+                                                return "Error checking username";
+                                            }
+                                        }
+                                    })}
+                                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:ring focus:ring-blue-200 focus:outline-none"
+                                />
+                                {errors.username && <p className="text-red-500 text-sm">{errors.username.message}</p>}
+                            </div>
+
+                            {/* Password */}
                             <div className="space-y-1 text-left">
                                 <label className="block font-semibold text-gray-700 dark:text-gray-200">Password</label>
                                 <div className="relative">
@@ -180,7 +277,7 @@ function EmployerRegister() {
                                 {errors.password && <p className="text-red-400 text-sm">{errors.password.message}</p>}
                             </div>
 
-
+                            {/* Confirm Password */}
                             <div className="space-y-1 text-left">
                                 <label className="block font-semibold text-gray-700 dark:text-gray-200">Confirm Password</label>
                                 <div className="relative">
@@ -204,7 +301,6 @@ function EmployerRegister() {
                                 {errors.password_confirmation && <p className="text-red-400 text-sm">{errors.password_confirmation.message}</p>}
                             </div>
 
-
                             <div className="flex justify-between">
                                 <button
                                     type="button"
@@ -220,27 +316,20 @@ function EmployerRegister() {
                                     Register
                                 </button>
                             </div>
-
                         </motion.div>
                     )}
                 </AnimatePresence>
+
                 <div className="mt-4 text-end space-y-2">
-                    <Link
-                        to="/register"
-                        className="block text-blue-600 dark:text-blue-400 hover:underline"
-                    >
+                    <Link to="/register" className="block text-blue-600 dark:text-blue-400 hover:underline">
                         Employee Registration
                     </Link>
-
-                    <Link
-                        to="/login"
-                        className="block text-blue-600 dark:text-blue-400 hover:underline"
-                    >
+                    <Link to="/login" className="block text-blue-600 dark:text-blue-400 hover:underline">
                         Already have an account?
                     </Link>
                 </div>
             </form>
-        </div>
+        </div >
     );
 }
 

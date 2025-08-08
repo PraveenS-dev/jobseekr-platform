@@ -17,10 +17,11 @@ Route::middleware('api')->group(function () {
     Route::post('/login',    [AuthController::class, 'login']);
     Route::post('/register', [AuthController::class, 'register']);
     Route::post('/users/userNameUnique', [UserController::class, 'userNameUnique']);
+    Route::post('/users/emailUnique', [UserController::class, 'emailUnique']);
     Route::post('/users/{id}/public-key', [UserController::class, 'storePublicKey']);
     Route::get('/users/{id}/public-key', [UserController::class, 'getPublicKey']);
     Route::get('/jobs/list', [JobController::class, 'list']);
-    
+
     Route::get('/migrate-debug', function () {
         try {
             Artisan::call('migrate', ['--force' => true]);

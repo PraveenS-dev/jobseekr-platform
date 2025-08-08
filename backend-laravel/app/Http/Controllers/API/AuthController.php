@@ -22,7 +22,7 @@ class AuthController extends Controller
                 'username' => 'required|string|max:50|unique:users,username',
                 'email'    => 'required|string|email|max:255|unique:users,email',
                 'password' => 'required|string|min:6',
-                'role'     => 'nullable|string|max:50',
+                'role'     => 'nullable|max:50',
             ]);
 
             if ($validator->fails()) {
@@ -57,7 +57,7 @@ class AuthController extends Controller
                 'status'  => 'error',
                 'message' => 'Something went wrong during registration',
                 'error'   => $e->getMessage(),
-                'trace'   => config('app.debug') ? $e->getTrace() : [] 
+                'trace'   => config('app.debug') ? $e->getTrace() : []
             ], 500);
         }
     }
@@ -66,10 +66,22 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         $credentials = $request->only('email', 'password');
-        $token = auth('api')->attempt($credentials);
 
-        if (!$token) {
-            return response()->json(['error' => 'Unauthorized'], 401);
+        // Check if user exists and get status
+        $user = User::where('email', $credentials['email'])->first();
+
+        if (!$user) {
+            return response()->json(['error' => 'Invalid credentials'], 401);
+        }
+
+        // Check if blocked
+        if ($user->status == 0) {
+            return response()->json(['error' => 'You are blocked by admin. Please contact support.'], 403);
+        }
+
+        // Try to authenticate
+        if (!$token = auth('api')->attempt($credentials)) {
+            return response()->json(['error' => 'Invalid credentials'], 401);
         }
 
         return response()->json([
@@ -79,6 +91,7 @@ class AuthController extends Controller
             'user'         => auth('api')->user(),
         ]);
     }
+
 
     // Logout
     public function logout()

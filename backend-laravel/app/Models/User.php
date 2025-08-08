@@ -244,6 +244,21 @@ class User extends Authenticatable implements JWTSubject
         return $data;
     }
 
+    public function emailExistCheck($id, $email)
+    {
+
+        $data = $this->where('id', '!=', $id)->where('email', $email)->count();
+
+        return $data;
+    }
+
+    public function emailCheck($email)
+    {
+
+        $data = $this->where('email', $email)->count();
+
+        return $data;
+    }
 
     protected static function booted()
     {

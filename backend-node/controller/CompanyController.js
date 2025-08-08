@@ -31,6 +31,17 @@ const list = async (req, res) => {
 const store = async (req, res) => {
     const { comp_name, comp_email, comp_ph, comp_reg_no, comp_address } = req.fields;
 
+    // Check for unique fields
+    const existingEmail = await Company.findOne({ comp_email });
+    if (existingEmail) {
+        return res.status(400).json({ field: 'comp_email', message: 'Email already exists!' });
+    }
+
+    const existingPhone = await Company.findOne({ comp_ph });
+    if (existingPhone) {
+        return res.status(400).json({ field: 'comp_ph', message: 'Phone number already exists!' });
+    }
+
     const regNoExist = await Company.findOne({ comp_reg_no });
 
     if (regNoExist) {
@@ -69,11 +80,29 @@ const update = async (req, res) => {
 
 const unique = async (req, res) => {
     try {
-        const company = await Company.findOne({ comp_reg_no: req.body.comp_reg_no, status: 1, trash: "NO" });
-        res.json({ exists: !!company });
+        const company = await Company.findOne({ comp_reg_no: req.fields.comp_reg_no, status: 1, trash: "NO" });
+        res.json({ existValue: !!company });
     } catch (err) {
         return res.status(500).json({ message: err })
     }
 }
 
-module.exports = { list, store, update, unique };
+const emailUnique = async (req, res) => {
+    try {
+        const company = await Company.findOne({ comp_email: req.fields.comp_email, status: 1, trash: "NO" });
+        res.json({ data: { existValue: !!company } });
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+};
+
+const phUnique = async (req, res) => {
+    try {
+        const company = await Company.findOne({ comp_ph: req.fields.comp_ph, status: 1, trash: "NO" });
+        res.json({ data: { existValue: !!company } });
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+};
+
+module.exports = { list, store, update, unique, emailUnique, phUnique };

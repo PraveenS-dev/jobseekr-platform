@@ -308,6 +308,24 @@ class UserController extends BaseController
         return $this->sendResponse($response, "Unique Check!");
     }
 
+    public function emailUnique(Request $request)
+    {
+        $id = $request->id;
+        $email = $request->email;
+
+        if ($id != null || $id != "") {
+            $exist = $this->users->emailExistCheck($id, $email);
+        } else {
+            $exist = $this->users->emailCheck($email);
+        }
+
+        $response = array(
+            'existValue' => $exist ? false : true
+        );
+
+        return $this->sendResponse($response, "Unique Check!");
+    }
+
 
     public function storePublicKey(Request $request, $id)
     {

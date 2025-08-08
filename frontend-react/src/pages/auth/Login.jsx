@@ -3,6 +3,7 @@ import api from "../../services/api";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
+import { toast } from "react-toastify";
 
 function Login() {
     const { login } = useAuth();
@@ -22,7 +23,14 @@ function Login() {
             await login(form.email, form.password);
             navigate("/dashboard");
         } catch (err) {
-            setError("Invalid credentials");
+            const msg = err.response?.data?.error;
+
+            if (msg === "You are blocked by admin. Please contact support.") {
+                toast.error("⚠️ You are blocked by admin. Please contact support.");
+            } else {
+                toast.error("Invalid credentials.");
+                setError("Invalid credentials");
+            }
         }
     };
 
