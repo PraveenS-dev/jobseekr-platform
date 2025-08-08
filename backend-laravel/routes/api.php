@@ -1,15 +1,16 @@
 <?php
 
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Artisan;
 use App\Http\Controllers\API\AuthController;
+use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\JobSeekr\JobController;
+use App\Http\Controllers\Admin\NotificationController;
 use App\Http\Controllers\Admin\JobSeekr\AdminController;
 use App\Http\Controllers\Admin\JobSeekr\AdminJobController;
 use App\Http\Controllers\Admin\JobSeekr\BookmarkController;
 use App\Http\Controllers\Admin\JobSeekr\ApplicationController;
-use App\Http\Controllers\Admin\NotificationController;
-use App\Http\Controllers\Admin\UserController;
-use Illuminate\Support\Facades\Artisan;
 
 Route::middleware('api')->group(function () {
 
@@ -19,10 +20,26 @@ Route::middleware('api')->group(function () {
     Route::post('/users/{id}/public-key', [UserController::class, 'storePublicKey']);
     Route::get('/users/{id}/public-key', [UserController::class, 'getPublicKey']);
     Route::get('/jobs/list', [JobController::class, 'list']);
-    Route::get('/migrate', function () {
-        Artisan::call('migrate');
-        return 'Migration completed!';
+    
+    Route::get('/migrate-debug', function () {
+        try {
+            Artisan::call('migrate', ['--force' => true]);
+            return nl2br(Artisan::output());
+        } catch (\Exception $e) {
+            return $e->getMessage();
+        }
     });
+
+    Route::get('/reset', function () {
+        Artisan::call('migrate:reset', ['--force' => true]);
+        Artisan::call('migrate', ['--force' => true]);
+        return 'Migration reset and re-run!';
+    });
+
+    Route::get('/check-db', function () {
+        return DB::select('SELECT DATABASE() AS db_name');
+    });
+
     Route::middleware('jwt.auth')->group(function () {
         Route::get('/user',   [AuthController::class, 'me']);
         Route::post('/logout', [AuthController::class, 'logout']);
