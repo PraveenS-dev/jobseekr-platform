@@ -40,7 +40,7 @@ class AuthController extends Controller
                 'comp_id'    => $request->comp_id,
                 'role'       => $request->role ?? 1,
                 'password'   => Hash::make($request->password),
-                'created_by' => Auth::id(),
+                'created_by' => 1,
             ]);
 
             $token = JWTAuth::fromUser($user);
