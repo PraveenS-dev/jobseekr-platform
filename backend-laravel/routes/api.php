@@ -31,6 +31,16 @@ Route::middleware('api')->group(function () {
         }
     });
 
+    Route::get('/storage-link-debug', function () {
+        try {
+            Artisan::call('storage:link');
+            return nl2br(Artisan::output());
+        } catch (\Exception $e) {
+            return $e->getMessage();
+        }
+    });
+
+
     Route::get('/reset', function () {
         Artisan::call('migrate:reset', ['--force' => true]);
         Artisan::call('migrate', ['--force' => true]);
