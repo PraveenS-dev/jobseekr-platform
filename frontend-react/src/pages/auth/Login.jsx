@@ -21,7 +21,6 @@ function Login() {
         try {
             await login(form.email, form.password);
             navigate("/dashboard");
-            // navigate("/bookmarks");
         } catch (err) {
             setError("Invalid credentials");
         }
