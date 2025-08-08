@@ -9,7 +9,7 @@ import { FaEye, FaEyeSlash } from 'react-icons/fa';
 
 
 function EmployerRegister() {
-    const { register, handleSubmit, formState: { errors }, trigger } = useForm({ mode: 'onChange' });
+    const { register, handleSubmit, formState: { errors }, trigger, watch } = useForm({ mode: 'onChange' });
     const [step, setStep] = useState(1);
     const [status, setStatus] = useState({ step1: 'default', step2: 'default' });
     const { setUser } = useAuth();
