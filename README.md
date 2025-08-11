@@ -87,4 +87,4 @@ DB_PASSWORD=
 When sharing this project link, a custom branded preview banner will be shown thanks to Open Graph tags.
 
 📜 License
-MIT License © 2025
+MIT License © 2025 Praveen Kumar S
