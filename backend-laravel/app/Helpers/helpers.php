@@ -220,6 +220,7 @@ if (!function_exists('notificationSave')) {
         $assigned_persons_id = $data['assign_person_ids'] ?? [];
         $title = $data['title'] ?? '';
         $message = $data['message'] ?? '';
+        $url = $data['url'] ?? '';
 
         $response = Http::asForm()->post(env('NODE_URL') . '/send-notification', [
             'id' => $notification->id,
@@ -227,6 +228,7 @@ if (!function_exists('notificationSave')) {
             'assign_person_ids' => $assigned_persons_id,
             'title' => $title,
             'message' => $message,
+            'url' => $url,
             'created_at' => now()->toISOString(),
         ]);
     }

@@ -120,6 +120,7 @@ class ApplicationController extends BaseController
                 'assign_person_ids' => $assigned_persons_id,
                 'title' => $title,
                 'message' => $message,
+                'url' => "/application/view/" . encryptId($job_application->id),
             );
 
             notificationSave($notification_data);
@@ -218,6 +219,7 @@ class ApplicationController extends BaseController
                     'assign_person_ids' => $assigned_persons_id,
                     'title' => $title,
                     'message' => $message,
+                    'url' => "/application/view/" . encryptId($job_application->id),
                 );
 
                 notificationSave($notification_data);
@@ -251,6 +253,7 @@ class ApplicationController extends BaseController
                     'assign_person_ids' => $assigned_persons_id,
                     'title' => $title,
                     'message' => $message,
+                    'url' => "/application/view/" . encryptId($job_application->id),
                 );
 
                 notificationSave($notification_data);
@@ -289,6 +292,7 @@ class ApplicationController extends BaseController
                 'assign_person_ids' => $assigned_persons_id,
                 'title' => $title,
                 'message' => $message,
+                'url' => "/application/view/" . encryptId($job_application->id),
             );
 
             notificationSave($notification_data);

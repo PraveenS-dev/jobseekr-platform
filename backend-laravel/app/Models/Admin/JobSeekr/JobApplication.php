@@ -65,7 +65,7 @@ class JobApplication extends Model
 
      
 
-        return $this->create($insertArray);
+        return JobApplication::create($insertArray);
     }
 
     public function selectOne($id)

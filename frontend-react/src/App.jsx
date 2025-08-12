@@ -29,39 +29,45 @@ import Connections from "./pages/Connections";
 
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { AllNotifications } from "./pages/admin/AllNotifications";
+
+import AnimatedLayout from "./layouts/AnimatedLayout";
 
 function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
         <Routes>
-          <Route path="/login" element={<AuthLayout> <Login /></AuthLayout>} />
-          <Route path="/register" element={<AuthLayout> <Register /></AuthLayout>} />
-          <Route path="/employerRegister" element={<AuthLayout> <EmployerRegister /></AuthLayout>} />
+          <Route element={<AnimatedLayout />}>
+            <Route path="/login" element={<AuthLayout> <Login /></AuthLayout>} />
+            <Route path="/register" element={<AuthLayout> <Register /></AuthLayout>} />
+            <Route path="/employerRegister" element={<AuthLayout> <EmployerRegister /></AuthLayout>} />
 
-          <Route path="/bookmarks" element={<ProtectedRoute> <MainLayout><Bookmarks /> </MainLayout></ProtectedRoute>} />
-          <Route path="/dashboard" element={<ProtectedRoute> <MainLayout> <Dashboard /> </MainLayout></ProtectedRoute>} />
-          <Route path="/jobs" element={<ProtectedRoute> <MainLayout> <Jobs /></MainLayout> </ProtectedRoute>} />
-          <Route path="/jobs/store" element={<ProtectedRoute> <MainLayout> <AddJobs /></MainLayout> </ProtectedRoute>} />
+            <Route path="/bookmarks" element={<ProtectedRoute> <MainLayout><Bookmarks /> </MainLayout></ProtectedRoute>} />
+            <Route path="/dashboard" element={<ProtectedRoute> <MainLayout> <Dashboard /> </MainLayout></ProtectedRoute>} />
+            <Route path="/jobs" element={<ProtectedRoute> <MainLayout> <Jobs /></MainLayout> </ProtectedRoute>} />
+            <Route path="/jobs/store" element={<ProtectedRoute> <MainLayout> <AddJobs /></MainLayout> </ProtectedRoute>} />
 
-          <Route path="/admin/dashboard" element={<ProtectedRoute> <MainLayout> <AdminDashboard /></MainLayout> </ProtectedRoute>} />
-          <Route path="/admin/job-approval" element={<ProtectedRoute><MainLayout> <JobApproval /></MainLayout> </ProtectedRoute>} />
-          <Route path="/view-job/:id" element={<ProtectedRoute><MainLayout> <ViewJobs /></MainLayout> </ProtectedRoute>} />
-          <Route path="/view-job/approval/:id" element={<ProtectedRoute><MainLayout> <ViewJobs approvalMode={true} /></MainLayout> </ProtectedRoute>} />
-          <Route path="/apply-job/:id" element={<ProtectedRoute><MainLayout> <JobApply /></MainLayout> </ProtectedRoute>} />
-          <Route path="/application/list" element={<ProtectedRoute><MainLayout> <ApplicationList /></MainLayout> </ProtectedRoute>} />
-          <Route path="/application/view/:id" element={<ProtectedRoute><MainLayout> <ApplicationView /></MainLayout> </ProtectedRoute>} />
+            <Route path="/admin/dashboard" element={<ProtectedRoute> <MainLayout> <AdminDashboard /></MainLayout> </ProtectedRoute>} />
+            <Route path="/admin/job-approval" element={<ProtectedRoute><MainLayout> <JobApproval /></MainLayout> </ProtectedRoute>} />
+            <Route path="/view-job/:id" element={<ProtectedRoute><MainLayout> <ViewJobs /></MainLayout> </ProtectedRoute>} />
+            <Route path="/view-job/approval/:id" element={<ProtectedRoute><MainLayout> <ViewJobs approvalMode={true} /></MainLayout> </ProtectedRoute>} />
+            <Route path="/apply-job/:id" element={<ProtectedRoute><MainLayout> <JobApply /></MainLayout> </ProtectedRoute>} />
+            <Route path="/application/list" element={<ProtectedRoute><MainLayout> <ApplicationList /></MainLayout> </ProtectedRoute>} />
+            <Route path="/application/view/:id" element={<ProtectedRoute><MainLayout> <ApplicationView /></MainLayout> </ProtectedRoute>} />
 
-          <Route path="/users/list" element={<ProtectedRoute><MainLayout> <UsersList /></MainLayout> </ProtectedRoute>} />
-          <Route path="/users/view/:id" element={<ProtectedRoute><MainLayout> <UserProfile /></MainLayout> </ProtectedRoute>} />
-          <Route path="/users/profile" element={<ProtectedRoute><MainLayout> <Profile /></MainLayout> </ProtectedRoute>} />
-          <Route path="/users/editProfile/:id" element={<ProtectedRoute><MainLayout> <UpdateProfile /></MainLayout> </ProtectedRoute>} />
+            <Route path="/users/list" element={<ProtectedRoute><MainLayout> <UsersList /></MainLayout> </ProtectedRoute>} />
+            <Route path="/users/view/:id" element={<ProtectedRoute><MainLayout> <UserProfile /></MainLayout> </ProtectedRoute>} />
+            <Route path="/users/profile" element={<ProtectedRoute><MainLayout> <Profile /></MainLayout> </ProtectedRoute>} />
+            <Route path="/users/editProfile/:id" element={<ProtectedRoute><MainLayout> <UpdateProfile /></MainLayout> </ProtectedRoute>} />
 
-          <Route path="/chats" element={<ProtectedRoute><MainLayout> <ChatPage /></MainLayout> </ProtectedRoute>} />
-          <Route path="/connections" element={<ProtectedRoute><MainLayout> <Connections /></MainLayout> </ProtectedRoute>} />
+            <Route path="/chats" element={<ProtectedRoute><MainLayout> <ChatPage /></MainLayout> </ProtectedRoute>} />
+            <Route path="/connections" element={<ProtectedRoute><MainLayout> <Connections /></MainLayout> </ProtectedRoute>} />
+            <Route path="/notifications" element={<ProtectedRoute><MainLayout> <AllNotifications /></MainLayout> </ProtectedRoute>} />
 
-          {/* Redirect all unknown routes to login */}
-          <Route path="*" element={<Navigate to="/login" />} />
+            {/* Redirect all unknown routes to login */}
+            <Route path="*" element={<Navigate to="/login" />} />
+          </Route>
         </Routes>
 
         <ToastContainer

@@ -17,6 +17,7 @@ return new class extends Migration
             $table->text('assign_person_ids')->nullable();
             $table->string('title');
             $table->text('message');
+            $table->text('url');
             $table->integer('is_read')->default(0);
             $table->integer('created_by');
             $table->integer('updated_by')->nullable();

@@ -3,9 +3,10 @@ import { io } from "socket.io-client";
 import { FaBell } from "react-icons/fa";
 import { socket } from '../../socket';
 import { useAuth } from '../../contexts/AuthContext';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useState } from 'react';
 import api from '../../services/api';
+import { Link, useNavigate } from 'react-router-dom';
 
 export const Notification = () => {
 
@@ -13,6 +14,8 @@ export const Notification = () => {
     const [unreadCount, setUnreadCount] = useState(0);
     const [isOpen, setIsOpen] = useState(false);
     const { user } = useAuth();
+    const navigate = useNavigate();
+    const containerRef = useRef(null);
 
     const formatTimeAgo = (date) => {
         const now = new Date();
@@ -49,6 +52,26 @@ export const Notification = () => {
         };
     }, [user.id]);
 
+    // Close dropdown when clicking outside or pressing Escape
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (containerRef.current && !containerRef.current.contains(event.target)) {
+                setIsOpen(false);
+            }
+        };
+        const handleKeyDown = (event) => {
+            if (event.key === 'Escape') {
+                setIsOpen(false);
+            }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        document.addEventListener('keydown', handleKeyDown);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+            document.removeEventListener('keydown', handleKeyDown);
+        };
+    }, []);
+
 
     const markAllAsRead = async (id = '') => {
         await api.post("/notification/markAllRead", { id });
@@ -63,10 +86,16 @@ export const Notification = () => {
             setUnreadCount(0);
         }
     };
+    const reDirectPage = (url) => {
+        if (url != null && url != '') {
+            navigate(url);
+        }
+
+    }
 
 
     return (
-        <div className="relative">
+        <div ref={containerRef} className="relative">
             <button
                 onClick={() => setIsOpen(!isOpen)}
                 className="relative p-3 rounded-full bg-white/40 dark:bg-gray-800/40 backdrop-blur-md shadow-md hover:shadow-blue-500/40 hover:scale-110 hover:bg-white/60 dark:hover:bg-gray-700/60 transition-all duration-300 ease-out"
@@ -80,7 +109,7 @@ export const Notification = () => {
             </button>
 
             <div
-                className={`absolute right-0 mt-3 w-[420px] bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg shadow-2xl rounded-2xl border border-white/20 dark:border-gray-700/40 overflow-hidden z-50 transform transition-all duration-300 ease-out origin-top ${isOpen
+                className={`fixed top-16 left-2 right-2 sm:absolute sm:top-auto sm:left-auto sm:right-0 mt-0 sm:mt-3 w-[calc(100vw-1rem)] sm:w-[420px] min-w-[280px] max-w-[100vw] bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg shadow-2xl rounded-2xl border border-white/20 dark:border-gray-700/40 overflow-hidden z-50 transform transition-all duration-300 ease-out origin-top ${isOpen
                     ? "opacity-100 scale-100 translate-y-0"
                     : "opacity-0 scale-95 -translate-y-2 pointer-events-none"
                     }`}
@@ -106,7 +135,8 @@ export const Notification = () => {
                         notifications.map((n, idx) => {
                             const isUnread = !n.is_read;
                             return (
-                                <div key={idx} onClick={() => markAllAsRead(n.id)}>
+                                <div key={idx} onClick={() => { markAllAsRead(n.id); reDirectPage(n.url) }
+                                }>
                                     <div
                                         className={`p-4 rounded-xl shadow-sm transition-all duration-300 cursor-pointer hover:-translate-y-1 hover:shadow-lg ${isUnread
                                             ? "bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-900/40 dark:to-blue-800/40 border border-blue-200 dark:border-blue-700 hover:border-blue-400 dark:hover:border-blue-500"
@@ -144,15 +174,15 @@ export const Notification = () => {
                 </div>
 
                 <div className="border-t border-white/20 dark:border-gray-700/40 px-5 py-3 bg-gray-50/60 dark:bg-gray-800/60 backdrop-blur-sm">
-                    <a
-                        href="/notifications"
+                    <Link
+                        to="/notifications"
                         className="text-sm font-semibold text-blue-600 dark:text-blue-400 hover:underline hover:text-blue-800 dark:hover:text-blue-300 transition"
                     >
                         View All
-                    </a>
+                    </Link>
                 </div>
             </div>
-        </div>
+        </div >
     );
 
 }

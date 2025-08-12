@@ -1,17 +1,13 @@
-import { useEffect, useState } from "react";
 import { Moon, Sun } from "lucide-react";
+import { useTheme } from "../contexts/ThemeContext.jsx";
 
 export default function ThemeToggle() {
-  const [dark, setDark] = useState(() => localStorage.getItem("theme") === "dark");
-
-  useEffect(() => {
-    document.documentElement.classList.toggle("dark", dark);
-    localStorage.setItem("theme", dark ? "dark" : "light");
-  }, [dark]);
+  const { theme, toggleTheme } = useTheme();
+  const dark = theme === "dark";
 
   return (
     <button
-      onClick={() => setDark(!dark)}
+      onClick={toggleTheme}
       className="relative w-16 h-8 rounded-full p-1 transition-all duration-500 shadow-lg overflow-hidden
                  bg-gradient-to-r from-yellow-400 via-blue-200 to-blue-500
                  dark:from-indigo-800 dark:via-purple-800 dark:to-blue-900

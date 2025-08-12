@@ -615,7 +615,7 @@ const UserProfile = () => {
                 <div className="flex items-center justify-center min-h-screen px-2 sm:px-4">
                     <div className="fixed inset-0 bg-black opacity-30" aria-hidden="true" />
                     <div className="relative bg-white dark:bg-gray-800 rounded-lg max-w-4xl w-full p-3 sm:p-6 z-50">
-                        <Dialog.Title className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4">Resume Preview</Dialog.Title>
+                        <Dialog.Title className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4 dark:text-white">Resume Preview</Dialog.Title>
                         <iframe
                             src={userData.resume_link}
                             title="Resume"

@@ -119,14 +119,14 @@ io.on("connection", (Socket) => {
 });
 
 app.post("/send-notification", (req, res) => {
-    const { id, sender_id, assign_person_ids, title, message, created_at } = req.fields;
+    const { id, sender_id, assign_person_ids, title, message, url, created_at } = req.fields;
 
     const recipients = Array.isArray(assign_person_ids) ? assign_person_ids : [assign_person_ids];
 
     recipients.forEach(userId => {
         const socketId = onlineUsers[userId];
         if (socketId) {
-            io.to(socketId).emit("notification", { id, title, message, created_at });
+            io.to(socketId).emit("notification", { id, title, message, url, created_at });
             console.log(`Sent notification to ${userId}`);
         }
     });
