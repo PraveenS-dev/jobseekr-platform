@@ -46,4 +46,24 @@ const getViewerCount = async (req, res) => {
     return res.status(200).json({ viewCount: ViewersCount });
 }
 
-module.exports = { store, getViewerCount };
+const getViewerIds = async (req, res) => {
+    try {
+        const { profile_id } = req.params;
+
+        const profileViews = await ProfileViewCount.find({ profile_id });
+
+        if (!profileViews || profileViews.length === 0) {
+            return res.status(404).json({ message: "No viewers found" });
+        }
+
+        const viewerIds = profileViews.map(view => view.viewer_id);
+
+        return res.status(200).json({ viewer_ids: viewerIds });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: "Server error" });
+    }
+};
+
+
+module.exports = { store, getViewerCount, getViewerIds };

@@ -102,7 +102,6 @@ const UsersList = () => {
         }),
     };
 
-
     const FetchUsers = useCallback(async (search = "", page = currentPage, per_page = perPage) => {
         try {
             setLoading(true);

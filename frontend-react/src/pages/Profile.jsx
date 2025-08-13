@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import api from "../services/api";
 import { Pencil } from "lucide-react";
@@ -10,6 +10,8 @@ import { useAuth } from "../contexts/AuthContext";
 import axios from "axios";
 import ReactCrop, { centerCrop, makeAspectCrop } from "react-image-crop";
 import "react-image-crop/dist/ReactCrop.css";
+import { XMarkIcon } from "@heroicons/react/24/solid";
+
 
 const Profile = () => {
     const [userData, setUserData] = useState(null);
@@ -20,6 +22,7 @@ const Profile = () => {
     const [isChangeCoverModalOpen, setIsChangeCoverOpen] = useState(false);
     const [isChangeProfileModalOpen, setIsChangeProfileOpen] = useState(false);
     const [isProfilePreviewOpen, setIsProfilePreviewOpen] = useState(false);
+    const [isProfileViewersOpen, setIsProfileViewersOpen] = useState(false);
     const [progress, setProgress] = useState(0);
     const { user } = useAuth();
 
@@ -30,6 +33,11 @@ const Profile = () => {
     const [crop, setCrop] = useState();
     const [brightness, setBrightness] = useState(100);
     const imgRef = useRef();
+
+    const [profileViewerIds, setProfileViewerIds] = useState([]);
+    const [profileViewerDetails, setProfileViewerDetails] = useState([]);
+    const [loading, setLoading] = useState(true);
+
 
     const GetUserData = async () => {
         try {
@@ -64,6 +72,36 @@ const Profile = () => {
         }
     };
 
+    const Viewprofile = useCallback((id) => {
+        navigate(`/users/view/${id}`, { state: { from: location.pathname } });
+    }, [navigate]);
+
+    const GetViewerIds = async (id) => {
+        try {
+            const res = await axios.get(`${import.meta.env.VITE_NODE_BASE_URL}/profileViewCount/getViewerIds/${id}`);
+            const viewerIds = res.data?.viewer_ids || [];
+            setProfileViewerIds(viewerIds);
+
+            if (viewerIds.length > 0) {
+                const viewersData = await Promise.all(
+                    viewerIds.map(async (viewerId) => {
+                        try {
+                            const res = await api.get('/users/view', { params: { id: viewerId } });
+                            return res.data.data?.userDetails;
+                        } catch (err) {
+                            console.error("Failed to fetch user", err);
+                            return null;
+                        }
+                    })
+                );
+
+                setProfileViewerDetails(viewersData.filter(Boolean));
+                setLoading(false);
+            }
+        } catch (err) {
+            console.error("Failed to fetch viewer IDs", err);
+        }
+    };
 
     useEffect(() => {
         GetUserData();
@@ -73,8 +111,10 @@ const Profile = () => {
     useEffect(() => {
         if (userData) {
             GetViewCount(userData.id);
+            GetViewerIds(userData.id);
         }
     }, [userData]);
+
 
 
     useEffect(() => {
@@ -215,7 +255,6 @@ const Profile = () => {
         );
     };
 
-
     const onImageLoad = (e) => {
         const img = e.currentTarget;
         const aspect = 16 / 5;
@@ -260,7 +299,11 @@ const Profile = () => {
         });
     };
 
-    if (!userData) return <p className="text-center mt-10 text-gray-500 dark:text-gray-300">Loading profile...</p>;
+    const OpenProfileViewers = () => {
+        setIsProfileViewersOpen(true);
+    }
+
+    if (!userData) return <p className="text-center mt-10 text-gray-500 dark:text-gray-300"></p>;
 
     return (
         <>
@@ -348,7 +391,7 @@ const Profile = () => {
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.5 }}
-                            className="mt-6 bg-gradient-to-br from-white to-blue-50 dark:from-gray-800 dark:to-blue-950 rounded-2xl shadow-lg p-4 sm:p-6 border border-blue-200 dark:border-blue-700"
+                            className="mt-6 bg-gradient-to-br from-white to-blue-50 dark:from-gray-800 dark:to-blue-950 rounded-2xl shadow-lg p-4 sm:p-6 border border-blue-200 dark:border-blue-700 transition-all hover:shadow-2xl hover:scale-[1.015] duration-300"
                         >
                             <h2 className="text-lg sm:text-2xl font-bold mb-4 sm:mb-5 text-blue-600 dark:text-blue-400 flex items-center gap-2">
                                 🧾 About
@@ -395,7 +438,7 @@ const Profile = () => {
                                 transition={{ duration: 0.5 }}
                                 className="mt-6"
                             >
-                                <div className="bg-gradient-to-br from-white to-blue-50 dark:from-gray-800 dark:to-blue-950 rounded-2xl shadow-lg p-4 sm:p-6 border border-blue-200 dark:border-blue-700">
+                                <div className="bg-gradient-to-br from-white to-blue-50 dark:from-gray-800 dark:to-blue-950 rounded-2xl shadow-lg p-4 sm:p-6 border border-blue-200 dark:border-blue-700 transition-all hover:shadow-2xl hover:scale-[1.015] duration-300">
                                     <h2 className="text-lg sm:text-2xl font-bold text-blue-700 dark:text-blue-400 mb-4 sm:mb-8">
                                         🧑‍💼 Experience
                                     </h2>
@@ -406,7 +449,7 @@ const Profile = () => {
                                                 initial={{ opacity: 0, scale: 0.95 }}
                                                 animate={{ opacity: 1, scale: 1 }}
                                                 transition={{ duration: 0.4, delay: index * 0.1 }}
-                                                className="p-4 sm:p-6 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-md"
+                                                className="p-4 sm:p-6 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-md transition-all hover:shadow-2xl hover:scale-[1.015] duration-300"
                                             >
                                                 <div className="flex flex-col md:flex-row justify-between gap-3 sm:gap-4">
                                                     <div>
@@ -440,7 +483,7 @@ const Profile = () => {
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.4 }}
-                            className="mt-6 bg-gradient-to-br from-white to-blue-50 dark:from-gray-800 dark:to-blue-950 rounded-2xl shadow-md p-4 sm:p-6 border border-blue-200 dark:border-blue-700"
+                            className="mt-6 bg-gradient-to-br from-white to-blue-50 dark:from-gray-800 dark:to-blue-950 rounded-2xl shadow-md p-4 sm:p-6 border border-blue-200 dark:border-blue-700 transition-all hover:shadow-2xl hover:scale-[1.015] duration-300"
                         >
                             <h2 className="text-lg sm:text-2xl font-bold mb-4 text-blue-700 dark:text-blue-400">
                                 📞 Contact
@@ -460,8 +503,8 @@ const Profile = () => {
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.4 }}
-                            className="mt-6 bg-gradient-to-br from-white to-blue-50 dark:from-gray-800 dark:to-blue-950 rounded-2xl shadow-lg p-4 sm:p-6 border border-blue-200 dark:border-blue-700"
-                        >
+                            className="mt-6 bg-gradient-to-br from-white to-blue-50 dark:from-gray-800 dark:to-blue-950 rounded-2xl shadow-lg p-4 sm:p-6 border border-blue-200 dark:border-blue-700 transition-all hover:shadow-2xl hover:scale-[1.015] duration-300 cursor-pointer"
+                            onClick={() => OpenProfileViewers()}>
                             <h2 className="text-lg sm:text-2xl font-bold mb-4 text-blue-700 dark:text-blue-400 flex items-center gap-2">
                                 🧠 Activity
                             </h2>
@@ -476,7 +519,7 @@ const Profile = () => {
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ duration: 0.4 }}
-                                className="mt-6 bg-gradient-to-br from-white to-blue-50 dark:from-gray-800 dark:to-blue-950 rounded-2xl shadow-lg p-4 sm:p-6 border border-blue-200 dark:border-blue-700"
+                                className="mt-6 bg-gradient-to-br from-white to-blue-50 dark:from-gray-800 dark:to-blue-950 rounded-2xl shadow-lg p-4 sm:p-6 border border-blue-200 dark:border-blue-700 transition-all hover:shadow-2xl hover:scale-[1.015] duration-300"
                             >
                                 <h2 className="text-lg sm:text-2xl font-bold text-blue-700 dark:text-blue-400 mb-3 sm:mb-4">
                                     📄 Resume
@@ -484,7 +527,7 @@ const Profile = () => {
                                 <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
                                     <button
                                         onClick={() => setIsResumeModalOpen(true)}
-                                        className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition text-sm sm:text-base"
+                                        className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition text-sm sm:text-base cursor-pointer"
                                     >
                                         View Resume
                                     </button>
@@ -502,6 +545,84 @@ const Profile = () => {
                     </div>
                 </div>
             </div>
+
+            <Dialog
+                open={isProfileViewersOpen}
+                onClose={() => setIsProfileViewersOpen(false)}
+                className="fixed inset-0 z-50 flex items-center justify-center p-4"
+            >
+                {/* Overlay */}
+                <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" aria-hidden="true" />
+
+                {/* Modal */}
+                <div
+                    className="relative w-full max-w-4xl rounded-2xl z-50
+                    bg-white/50 dark:bg-gray-900/50
+                    backdrop-blur-xl border border-white/20 dark:border-gray-700/30
+                    bg-gradient-to-br from-white/60 to-white/30 dark:from-gray-800/60 dark:to-gray-800/30
+                    shadow-2xl overflow-hidden"
+                >
+                    {/* Close Button */}
+                    <button
+                        onClick={() => setIsProfileViewersOpen(false)}
+                        className="absolute top-4 right-4 p-2 rounded-full bg-white/70 dark:bg-gray-800/70 
+                        hover:bg-white/90 dark:hover:bg-gray-700/90 transition z-10"
+                    >
+                        <XMarkIcon className="w-5 h-5 text-gray-700 dark:text-gray-300" />
+                    </button>
+
+                    {/* Title */}
+                    <Dialog.Title className="text-2xl font-bold mb-4 px-6 pt-6 text-gray-900 dark:text-white">
+                        Profile Viewers
+                    </Dialog.Title>
+
+                    {/* Scrollable Content */}
+                    <div className="max-h-[600px] overflow-y-auto px-6 pb-6 space-y-4 pt-10">
+                        {loading ? (
+                            <div className="flex justify-center items-center py-20">
+                                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+                            </div>
+                        ) : (
+                            profileViewerDetails.map((user, index) => (
+                                <motion.div
+                                    key={user.id}
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ duration: 0.4, delay: index * 0.05 }}
+                                    onClick={() => Viewprofile(user.id)}
+                                    className="group flex items-center p-4 rounded-xl cursor-pointer
+                                        bg-gradient-to-br from-white to-blue-50 dark:from-gray-800 dark:to-blue-950
+                                        border border-blue-200 dark:border-blue-700
+                                        shadow-md hover:shadow-2xl hover:scale-[1.015]
+                                        transition-all duration-300 ease-out"
+                                >
+                                    {/* Avatar */}
+                                    <img
+                                        src={user.profile_url || `https://ui-avatars.com/api/?name=${user.name}&size=80`}
+                                        alt={user.name}
+                                        className="w-14 h-14 rounded-full object-cover border border-gray-300 dark:border-gray-500"
+                                    />
+
+                                    {/* Info */}
+                                    <div className="ml-4">
+                                        <div className="text-lg font-semibold text-blue-700 dark:text-blue-400">
+                                            {user.name}
+                                        </div>
+                                        <div className="text-sm text-gray-600 dark:text-gray-400">
+                                            @{user.username}
+                                        </div>
+                                        <div className="text-sm text-gray-500 dark:text-gray-300">
+                                            {user.email}
+                                        </div>
+                                    </div>
+                                </motion.div>
+                            ))
+                        )}
+                    </div>
+                </div>
+            </Dialog>
+
+
 
             {/* Resume Modal */}
             < Dialog open={isResumeModalOpen} onClose={() => setIsResumeModalOpen(false)} className="fixed z-50 inset-0 overflow-y-auto" >

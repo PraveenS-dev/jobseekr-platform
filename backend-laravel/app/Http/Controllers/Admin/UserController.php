@@ -195,7 +195,7 @@ class UserController extends BaseController
             ];
             return $this->sendResponse($success, "User Details !");
         } catch (Exception $ex) {
-            return $this->sendError('Unauthorised.', ['error' => 'Unauthorised'], 401);
+            return $this->sendError('Unauthorised.', ['error' => $id], 401);
         }
     }
     public function profile(Request $request)

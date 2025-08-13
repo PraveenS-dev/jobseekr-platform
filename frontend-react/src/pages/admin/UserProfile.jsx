@@ -270,7 +270,7 @@ const UserProfile = () => {
     };
 
 
-    if (!userData) return <p className="text-center mt-10 text-gray-500 dark:text-gray-300">Loading profile...</p>;
+    if (!userData) return <p className="text-center mt-10 text-gray-500 dark:text-gray-300"></p>;
 
     return (
         <>
