@@ -115,8 +115,6 @@ const Profile = () => {
         }
     }, [userData]);
 
-
-
     useEffect(() => {
         if (userData) {
             const fields = ['name', 'email', 'headline', 'phone', 'location', 'resume_link', 'skills', 'preferred_job_type'];
@@ -510,6 +508,9 @@ const Profile = () => {
                             </h2>
                             <p className="flex items-center gap-2 text-sm sm:text-base">
                                 <FiEye className="text-blue-700 dark:text-blue-400" /> <span className="font-semibold">Count:</span> {viewCount} Profile Views
+                            </p>
+                            <p className="text-xs sm:text-sm italic text-gray-600 dark:text-gray-400">
+                                Discover who's viewed your profile recently.
                             </p>
                         </motion.div>
 
