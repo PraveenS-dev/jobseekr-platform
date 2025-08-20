@@ -98,11 +98,10 @@ const Sidebar = () => {
           <div className="sm:hidden mb-6">
             <NavLink
               to={profileMenu.to}
-              className={`flex justify-center items-center p-2 rounded-lg transition-all ${
-                location.pathname === profileMenu.to
+              className={`flex justify-center items-center p-2 rounded-lg transition-all ${location.pathname === profileMenu.to
                   ? "bg-blue-100 dark:bg-blue-800"
                   : "hover:bg-gray-100 dark:hover:bg-gray-700"
-              }`}
+                }`}
               title="Profile"
             >
               {profileMenu.icon}
@@ -117,10 +116,9 @@ const Sidebar = () => {
                 className={({ isActive }) =>
                   `flex items-center space-x-3 px-3 py-2 rounded-lg text-sm font-medium 
                   transform transition-transform duration-150 active:scale-95 hover:scale-105
-                  ${
-                    isActive
-                      ? "bg-blue-100 dark:bg-blue-800 text-blue-600 dark:text-blue-200 shadow-sm"
-                      : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                  ${isActive
+                    ? "bg-blue-100 dark:bg-blue-800 text-blue-600 dark:text-blue-200 shadow-sm"
+                    : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
                   }`
                 }
               >
@@ -130,42 +128,47 @@ const Sidebar = () => {
             </li>
 
             {/* Main nav */}
-            {navItems.map((item, index) => {
-              let isActive = location.pathname === item.to;
-              if (item.name === "Jobs") isActive = checkJobsActive();
-              if (item.name === "Applications") isActive = checkApplicationsActive();
+            {navItems
+              .filter((item) => {
+                if (item.name === "Users" && user?.role !== 2) return false;
+                return true;
+              })
+              .map((item, index) => {
+                let isActive = location.pathname === item.to;
+                if (item.name === "Jobs") isActive = checkJobsActive();
+                if (item.name === "Applications") isActive = checkApplicationsActive();
 
-              return (
-                <motion.li
-                  key={index}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: index * 0.05 }}
-                >
-                  <NavLink
-                    to={item.to}
-                    onClick={() => {
-                      setClickedIndex(index);
-                      setTimeout(() => setClickedIndex(null), 400);
-                    }}
-                    className={`flex items-center justify-center sm:justify-start space-x-0 sm:space-x-3 px-2 sm:px-3 py-2 rounded-lg text-sm font-medium transition-all ${
-                      isActive
-                        ? "bg-blue-100 dark:bg-blue-800 text-blue-600 dark:text-blue-200 shadow-sm"
-                        : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
-                    }`}
-                    title={item.name}
+                return (
+                  <motion.li
+                    key={index}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: index * 0.05 }}
                   >
-                    <motion.span
-                      animate={clickedIndex === index ? shakeAnimation : {}}
-                      className="text-lg sm:text-base"
+                    <NavLink
+                      to={item.to}
+                      onClick={() => {
+                        setClickedIndex(index);
+                        setTimeout(() => setClickedIndex(null), 400);
+                      }}
+                      className={`flex items-center justify-center sm:justify-start space-x-0 sm:space-x-3 px-2 sm:px-3 py-2 rounded-lg text-sm font-medium transition-all ${isActive
+                          ? "bg-blue-100 dark:bg-blue-800 text-blue-600 dark:text-blue-200 shadow-sm"
+                          : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                        }`}
+                      title={item.name}
                     >
-                      {item.icon}
-                    </motion.span>
-                    <span className="hidden sm:inline">{item.name}</span>
-                  </NavLink>
-                </motion.li>
-              );
-            })}
+                      <motion.span
+                        animate={clickedIndex === index ? shakeAnimation : {}}
+                        className="text-lg sm:text-base"
+                      >
+                        {item.icon}
+                      </motion.span>
+                      <span className="hidden sm:inline">{item.name}</span>
+                    </NavLink>
+                  </motion.li>
+                );
+              })}
+
           </ul>
         </div>
       </motion.aside>
