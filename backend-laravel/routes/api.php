@@ -32,53 +32,43 @@ Route::middleware('api')->group(function () {
         }
     });
 
+    Route::get('/storage-link', function () {
+        try {
+            Artisan::call('storage:link');
+            return nl2br(Artisan::output());
+        } catch (\Exception $e) {
+            return $e->getMessage();
+        }
+    });
+
+    Route::get('/storage-link-debug', function () {
+        if (!file_exists(public_path('storage'))) {
+            return "Storage symlink missing!";
+        }
+        return "Storage symlink exists and is valid.";
+    });
+
+
+    Route::get('/reset', function () {
+        try {
+            Artisan::call('migrate:reset', ['--force' => true]);
+            Artisan::call('migrate', ['--force' => true]);
+            return nl2br("Migration reset and re-run!\n\n" . Artisan::output());
+        } catch (\Exception $e) {
+            return response($e->getMessage(), 500);
+        }
+    });
+
+    Route::get('/check-db', function () {
+        try {
+            $db = DB::select('SELECT DATABASE() AS db_name');
+            return response()->json($db);
+        } catch (\Exception $e) {
+            return response($e->getMessage(), 500);
+        }
+    });
+
     Route::middleware('jwt.auth')->group(function () {
-
-        Route::get('/storage-link', function () {
-            try {
-                if (Auth::user() && Auth::user()->role == ROLE_ADMIN) {
-                    Artisan::call('storage:link');
-                    return nl2br(Artisan::output());
-                } else {
-                    abort(403, 'Unauthorized: Admins only');
-                }
-            } catch (\Exception $e) {
-                return $e->getMessage();
-            }
-        });
-
-        Route::get('/storage-link-debug', function () {
-            if (!file_exists(public_path('storage'))) {
-                return "Storage symlink missing!";
-            }
-            return "Storage symlink exists and is valid.";
-        });
-
-
-        Route::get('/reset', function () {
-            if (Auth::user() && Auth::user()->role == ROLE_ADMIN) {
-                try {
-                    Artisan::call('migrate:reset', ['--force' => true]);
-                    Artisan::call('migrate', ['--force' => true]);
-                    return nl2br("Migration reset and re-run!\n\n" . Artisan::output());
-                } catch (\Exception $e) {
-                    return response($e->getMessage(), 500);
-                }
-            }
-            abort(403, 'Unauthorized: Admins only');
-        });
-
-        Route::get('/check-db', function () {
-            if (Auth::user() && Auth::user()->role == ROLE_ADMIN) {
-                try {
-                    $db = DB::select('SELECT DATABASE() AS db_name');
-                    return response()->json($db);
-                } catch (\Exception $e) {
-                    return response($e->getMessage(), 500);
-                }
-            }
-            abort(403, 'Unauthorized: Admins only');
-        });
 
         Route::get('/user',   [AuthController::class, 'me']);
         Route::post('/logout', [AuthController::class, 'logout']);

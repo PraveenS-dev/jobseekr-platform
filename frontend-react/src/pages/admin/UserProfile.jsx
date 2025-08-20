@@ -335,17 +335,19 @@ const UserProfile = () => {
                                 className="w-24 h-24 sm:w-36 sm:h-36 rounded-full border-4 border-white dark:border-gray-800 object-cover shadow-lg transition-transform duration-300 group-hover:scale-105 cursor-pointer"
                                 onClick={() => setIsProfilePreviewOpen(true)}
                             />
+                            {user.role == 2 &&
 
-                            <button
-                                onClick={() => setIsChangeProfileOpen(true)}
-                                className="absolute bottom-1 right-1 sm:bottom-2 sm:right-2 
+                                <button
+                                    onClick={() => setIsChangeProfileOpen(true)}
+                                    className="absolute bottom-1 right-1 sm:bottom-2 sm:right-2 
                                     bg-black/60 hover:bg-black/80 text-white 
                                     p-1.5 sm:p-2 rounded-full shadow-md transition-all 
                                     opacity-100 sm:opacity-0 sm:group-hover:opacity-100"
-                                title="Change profile picture"
-                            >
-                                <Pencil size={12} className="sm:w-4 sm:h-4" />
-                            </button>
+                                    title="Change profile picture"
+                                >
+                                    <Pencil size={12} className="sm:w-4 sm:h-4" />
+                                </button>
+                            }
                         </div>
                     </div>
 
@@ -588,7 +590,7 @@ const UserProfile = () => {
                                     <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
                                         <button
                                             onClick={() => setIsResumeModalOpen(true)}
-                                            className="px-4 py-2 bg-blue-600 text-white dark:bg-blue-500 rounded-md hover:bg-blue-700 dark:hover:bg-blue-600 transition duration-300 text-sm sm:text-base"
+                                            className="hidden px-4 py-2 bg-blue-600 text-white dark:bg-blue-500 rounded-md hover:bg-blue-700 dark:hover:bg-blue-600 transition duration-300 text-sm sm:text-base"
                                         >
                                             View Resume
                                         </button>
