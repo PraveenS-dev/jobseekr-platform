@@ -26,15 +26,18 @@ COPY . .
 # Install PHP dependencies
 RUN composer install --no-dev --optimize-autoloader
 
-# Set proper permissions for storage & bootstrap
-RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache \
-    && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
+# Ensure storage and bootstrap/cache directories exist with correct permissions
+RUN mkdir -p storage/framework/{cache,sessions,views} \
+    && mkdir -p bootstrap/cache \
+    && chown -R www-data:www-data storage bootstrap/cache \
+    && chmod -R 775 storage bootstrap/cache
 
 # Expose Render's required port
 EXPOSE 10000
 
-# Start Laravel and optimize configs/routes only
-CMD php artisan config:clear && \
+# Start Laravel: create symlink, optimize configs, run app
+CMD php artisan storage:link || true && \
+    php artisan config:clear && \
     php artisan config:cache && \
     php artisan route:cache && \
     php artisan serve --host=0.0.0.0 --port=10000

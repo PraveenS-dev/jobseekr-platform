@@ -34,7 +34,7 @@ Route::middleware('api')->group(function () {
 
     Route::middleware('jwt.auth')->group(function () {
 
-        Route::get('/storage-link-debug', function () {
+        Route::get('/storage-link', function () {
             try {
                 if (Auth::user() && Auth::user()->role == ROLE_ADMIN) {
                     Artisan::call('storage:link');
@@ -46,6 +46,14 @@ Route::middleware('api')->group(function () {
                 return $e->getMessage();
             }
         });
+
+        Route::get('/storage-link-debug', function () {
+            if (!file_exists(public_path('storage'))) {
+                return "Storage symlink missing!";
+            }
+            return "Storage symlink exists and is valid.";
+        });
+
 
         Route::get('/reset', function () {
             if (Auth::user() && Auth::user()->role == ROLE_ADMIN) {
