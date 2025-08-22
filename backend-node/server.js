@@ -134,7 +134,9 @@ app.post("/send-notification", (req, res) => {
     res.json({ success: true });
 });
 
-
+app.get("/ping", (req, res) => {
+    res.send("pong");
+});
 
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () =>
