@@ -105,4 +105,12 @@ class AuthController extends Controller
     {
         return response()->json(auth('api')->user());
     }
+
+    public function ping()
+    {
+        return response()->json([
+            'status' => 'ok',
+            'time'   => now()
+        ]);
+    }
 }

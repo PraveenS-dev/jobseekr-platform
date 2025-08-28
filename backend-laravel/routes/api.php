@@ -22,6 +22,7 @@ Route::middleware('api')->group(function () {
     Route::post('/users/{id}/public-key', [UserController::class, 'storePublicKey']);
     Route::get('/users/{id}/public-key', [UserController::class, 'getPublicKey']);
     Route::get('/jobs/list', [JobController::class, 'list']);
+    Route::get('/ping', [AuthController::class, 'ping']);
 
     Route::get('/migrate-debug', function () {
         try {

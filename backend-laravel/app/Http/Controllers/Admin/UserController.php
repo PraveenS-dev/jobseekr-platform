@@ -176,6 +176,7 @@ class UserController extends BaseController
             $userDetails['id'] = $user->id;
             $userDetails['enc_id'] = encryptId($user->id);
             $userDetails['name'] = $user->name;
+            $userDetails['username'] = $user->username;
             $userDetails['email'] = $user->email;
             $userDetails['role'] = $user->role;
             $userDetails['role_name'] = getUserRole($user->role);
