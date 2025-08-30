@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Tymon\JWTAuth\Http\Parser\AuthHeaders;
+use Illuminate\Support\Facades\Storage;
 
 class JobApplication extends Model
 {
@@ -34,39 +35,42 @@ class JobApplication extends Model
         'trash' => 'NO',
     ];
 
+
     public function apply($job_id)
     {
         $request = request();
-
+        $disk = env('FILESYSTEM_DISK', 'public');
         $upload_path = 'uploads/resume';
-        $disk = 'public';
         $file_path = '';
 
         if ($request->hasFile('resume')) {
-
-            $resume = $request->resume;
+            $resume = $request->file('resume');
 
             if ($resume->isValid()) {
                 $file_name = time() . Str::random(10) . '.' . $resume->getClientOriginalExtension();
-                $file_path = $resume->storeAs($upload_path, $file_name, $disk);
-                $file_path = asset('storage/' . $file_path);
+
+                $path = $resume->storeAs($upload_path, $file_name, [
+                    'disk' => $disk,
+                    'visibility' => $disk === 's3' ? 'public' : null,
+                ]);
+
+                $file_path = $disk === 's3'
+                    ? Storage::disk('s3')->url($path)
+                    : asset('storage/' . $path);
             }
         } else {
             $file_path = Auth::user()->resume_link;
         }
 
-        $insertArray = array(
+        return JobApplication::create([
             'user_id' => Auth::id(),
             'job_id' => $job_id,
             'application_status' => JOB_APPLICATION_PENDING,
             'resume_path' => $file_path,
             'created_by' => Auth::id(),
-        );
-
-     
-
-        return JobApplication::create($insertArray);
+        ]);
     }
+
 
     public function selectOne($id)
     {

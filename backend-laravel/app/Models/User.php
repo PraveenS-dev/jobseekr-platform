@@ -9,6 +9,7 @@ use Tymon\JWTAuth\Contracts\JWTSubject;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Support\Facades\Storage;
 
 class User extends Authenticatable implements JWTSubject
 {
@@ -114,25 +115,34 @@ class User extends Authenticatable implements JWTSubject
     public function updateUser($id)
     {
         $request = request();
-
         $user = User::findOrFail($id);
 
+        $disk = env('FILESYSTEM_DISK', 'public');
+        $upload_path = 'uploads/users/resume';
+
         if ($request->hasFile('resume')) {
-
-            $upload_path = 'uploads/users/resume/';
-            $disk = 'public';
-
             $file = $request->file('resume');
             $filename = uniqid() . '_' . time() . '.' . $file->getClientOriginalExtension();
 
-            $directory = storage_path('app/public/' . $upload_path);
-            if (!File::exists($directory)) {
-                File::makeDirectory($directory, 0755, true);
+            if ($user->resume_link) {
+                try {
+                    $oldFile = $disk === 's3'
+                        ? parse_url($user->resume_link, PHP_URL_PATH)
+                        : str_replace(asset('storage') . '/', '', $user->resume_link);
+
+                    Storage::disk($disk)->delete(ltrim($oldFile, '/'));
+                } catch (\Exception $e) {
+                }
             }
 
-            $file->storeAs($upload_path, $filename, $disk);
+            $path = $file->storeAs($upload_path, $filename, [
+                'disk' => $disk,
+                'visibility' => $disk === 's3' ? 'public' : null,
+            ]);
 
-            $resume_link = asset('storage/' . $upload_path . $filename);
+            $resume_link = $disk === 's3'
+                ? Storage::disk('s3')->url($path)
+                : asset('storage/' . $path);
         } else {
             $resume_link = $user->resume_link;
         }
@@ -152,28 +162,38 @@ class User extends Authenticatable implements JWTSubject
         return true;
     }
 
+
     public function changeCoverimage($id)
     {
         $request = request();
-
         $user = User::findOrFail($id);
 
+        $disk = env('FILESYSTEM_DISK', 'public');
+        $upload_path = 'uploads/users/cover_images';
+
         if ($request->hasFile('image')) {
-
-            $upload_path = 'uploads/users/cover_images/';
-            $disk = 'public';
-
             $file = $request->file('image');
             $filename = uniqid() . '_' . time() . '.' . $file->getClientOriginalExtension();
 
-            $directory = storage_path('app/public/' . $upload_path);
-            if (!File::exists($directory)) {
-                File::makeDirectory($directory, 0755, true);
+            if ($user->cover_img_path) {
+                try {
+                    $oldFile = $disk === 's3'
+                        ? parse_url($user->cover_img_path, PHP_URL_PATH)
+                        : str_replace(asset('storage') . '/', '', $user->cover_img_path);
+
+                    Storage::disk($disk)->delete(ltrim($oldFile, '/'));
+                } catch (\Exception $e) {
+                }
             }
 
-            $file->storeAs($upload_path, $filename, $disk);
+            $path = $file->storeAs($upload_path, $filename, [
+                'disk' => $disk,
+                'visibility' => $disk === 's3' ? 'public' : null,
+            ]);
 
-            $cover_img_path = asset('storage/' . $upload_path . $filename);
+            $cover_img_path = $disk === 's3'
+                ? Storage::disk('s3')->url($path)
+                : asset('storage/' . $path);
         } else {
             $cover_img_path = $user->cover_img_path;
         }
@@ -185,28 +205,38 @@ class User extends Authenticatable implements JWTSubject
         return true;
     }
 
+
     public function changeProfileimage($id)
     {
         $request = request();
-
         $user = User::findOrFail($id);
 
+        $disk = env('FILESYSTEM_DISK', 'public');
+        $upload_path = 'uploads/users/profile_images';
+
         if ($request->hasFile('image')) {
-
-            $upload_path = 'uploads/users/profile_images/';
-            $disk = 'public';
-
             $file = $request->file('image');
             $filename = uniqid() . '_' . time() . '.' . $file->getClientOriginalExtension();
 
-            $directory = storage_path('app/public/' . $upload_path);
-            if (!File::exists($directory)) {
-                File::makeDirectory($directory, 0755, true);
+            if ($user->profile_path) {
+                try {
+                    $oldFile = $disk === 's3'
+                        ? parse_url($user->profile_path, PHP_URL_PATH) // extract path from S3 URL
+                        : str_replace(asset('storage') . '/', '', $user->profile_path);
+
+                    Storage::disk($disk)->delete(ltrim($oldFile, '/'));
+                } catch (\Exception $e) {
+                }
             }
 
-            $file->storeAs($upload_path, $filename, $disk);
+            $path = $file->storeAs($upload_path, $filename, [
+                'disk' => $disk,
+                'visibility' => $disk === 's3' ? 'public' : null,
+            ]);
 
-            $profile_path = asset('storage/' . $upload_path . $filename);
+            $profile_path = $disk === 's3'
+                ? Storage::disk('s3')->url($path)
+                : asset('storage/' . $path);
         } else {
             $profile_path = $user->profile_path;
         }
@@ -217,8 +247,6 @@ class User extends Authenticatable implements JWTSubject
 
         return true;
     }
-
-
 
     public function SelectOne($id)
     {

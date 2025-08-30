@@ -153,6 +153,7 @@ class ApplicationController extends BaseController
             $applicationDetails['resume_path'] = $data->resume_path;
             $applicationDetails['created_at'] = $data->created_at;
             $applicationDetails['created_by'] = getUsername($data->created_by);
+            $applicationDetails['created_by_id'] = encryptId($data->created_by);
 
             return $this->sendResponse($applicationDetails, 'Job List Details');
         } catch (Exception $ex) {

@@ -61,7 +61,7 @@ class Notification extends Model
 
     public function getAllNotification()
     {
-        return $this->where('assign_person_ids', Auth::id())->get();
+        return $this->where('assign_person_ids', Auth::id())->OrderBy("created_at","DESC")->get();
     }
 
     public function getAllUnreadNotification()

@@ -114,10 +114,10 @@ export const ApplicationView = () => {
     }, [id]);
 
     useEffect(() => {
-        if (user?.id) {
-            GetUserData(user.id);
+        if (ApplicationDetails?.created_by_id) {
+            GetUserData(ApplicationDetails.created_by_id);
         }
-    }, [user?.id]);
+    }, [ApplicationDetails?.created_by_id]);
 
     useEffect(() => {
         if (ApplicationDetails?.job_id) {
@@ -213,7 +213,7 @@ export const ApplicationView = () => {
                 <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
                     <span className="font-semibold text-blue-600 dark:text-blue-400">Description:</span> {JobDetails?.description || "—"}
                 </p>
-                {ApplicationDetails.created_by !== user.id && user.role == 3 &&
+                {user.role != 1 &&
                     < div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3
                     bg-gray-50 dark:bg-gray-900 px-4 py-3 rounded-lg 
                             border border-gray-200 dark:border-gray-700">
