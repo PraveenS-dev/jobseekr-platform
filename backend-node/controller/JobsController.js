@@ -40,10 +40,10 @@ const list = async (req, res) => {
 }
 
 const store = async (req, res) => {
-    const { comp_id, title, description, category_id, location, salary, job_type, created_by } = req.fields;
+    const { comp_id, title, description, category_id, location, salary, job_type, created_by, created_by_name } = req.fields;
 
     try {
-        const newJob = new Jobs({ comp_id: comp_id, title: title, description: description, category_id: category_id, location: location, salary: salary, job_type: job_type, is_approved: 1, created_by: created_by });
+        const newJob = new Jobs({ comp_id: comp_id, title: title, description: description, category_id: category_id, location: location, salary: salary, job_type: job_type, is_approved: 1, created_by: created_by, created_by_name: created_by_name });
 
         await newJob.save();
 

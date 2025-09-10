@@ -217,6 +217,7 @@ if (!function_exists('notificationSave')) {
 
         $notification = Notification::create($data);
 
+        $item_id = $data['item_id'] ?? [];
         $assigned_persons_id = $data['assign_person_ids'] ?? [];
         $title = $data['title'] ?? '';
         $message = $data['message'] ?? '';
@@ -226,6 +227,7 @@ if (!function_exists('notificationSave')) {
             'id' => $notification->id,
             'sender_id' => Auth::id(),
             'assign_person_ids' => $assigned_persons_id,
+            'item_id' => $item_id,
             'title' => $title,
             'message' => $message,
             'url' => $url,

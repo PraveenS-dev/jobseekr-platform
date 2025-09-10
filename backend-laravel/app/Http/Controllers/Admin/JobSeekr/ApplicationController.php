@@ -117,6 +117,7 @@ class ApplicationController extends BaseController
             $message = getUsername(Auth::id()) . ' send a application for ' . $request->job_name . ' job.';
 
             $notification_data = array(
+                'item_id' => $job_application->id,
                 'assign_person_ids' => $assigned_persons_id,
                 'title' => $title,
                 'message' => $message,
@@ -217,6 +218,7 @@ class ApplicationController extends BaseController
                 $message = 'Your Application for ' . $request->job_name . ' job has been viewed by ' . getUsername(Auth::id());
 
                 $notification_data = array(
+                    'item_id' => $job_application->id,
                     'assign_person_ids' => $assigned_persons_id,
                     'title' => $title,
                     'message' => $message,
@@ -251,6 +253,7 @@ class ApplicationController extends BaseController
                 $message = 'Your resume has been viewed for ' . $request->job_name . ' job by ' . getUsername(Auth::id());
 
                 $notification_data = array(
+                    'item_id' => $job_application->id,
                     'assign_person_ids' => $assigned_persons_id,
                     'title' => $title,
                     'message' => $message,
@@ -290,6 +293,7 @@ class ApplicationController extends BaseController
             $title = "Job Application";
 
             $notification_data = array(
+                'item_id' => $job_application->id,
                 'assign_person_ids' => $assigned_persons_id,
                 'title' => $title,
                 'message' => $message,

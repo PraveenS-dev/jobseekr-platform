@@ -48,6 +48,9 @@ const JobsSchema = new mongoose.Schema({
     created_by: {
         type: Number,
     },
+    created_by_name: {
+        type: String,
+    },
     updated_by: {
         type: Number,
     },

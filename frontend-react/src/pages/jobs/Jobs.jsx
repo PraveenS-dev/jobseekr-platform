@@ -96,7 +96,7 @@ export const Jobs = () => {
         <h2 className="text-2xl font-bold text-center text-white dark:text-white">
           Job List
         </h2>
-        {user.role == 3 &&
+        {user.role != 1 &&
           <div className='text-end '>
             <button className='bg-green-500 text-white font-bold px-6 py-2 rounded-md hover:bg-green-600 cursor-pointer' onClick={() => AddJob()}>Add Job</button>
           </div>

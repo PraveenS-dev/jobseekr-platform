@@ -66,13 +66,12 @@ class NotificationController extends BaseController
     public function markAllRead(Request $request)
     {
         try {
-            $id = $request->id;
+            $id = $request->id ?? null;
             $data = $this->notification->markAllRead($id);
-
             return $this->sendResponse($data, 'Notification data!');
         } catch (Exception $ex) {
             report($ex);
-            return $this->sendError('Server Error.', ['error' => 'Something went wrong'], 500);
+            return $this->sendError('Server Error.', ['error' => $ex], 500);
         }
     }
 }

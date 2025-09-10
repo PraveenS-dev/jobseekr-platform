@@ -119,8 +119,8 @@ export const Notification = () => {
                         Notifications
                     </span>
                     <button
-                        onClick={markAllAsRead}
-                        className="text-xs font-medium text-white/90 hover:text-yellow-200 underline-offset-2 hover:underline transition"
+                        onClick={() => markAllAsRead(null)} // wrap in arrow function
+                        className="text-xs font-medium text-white/90 hover:text-yellow-200 underline-offset-2 hover:underline transition cursor-pointer"
                     >
                         Mark all as read
                     </button>

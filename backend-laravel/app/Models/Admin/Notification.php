@@ -18,6 +18,7 @@ class Notification extends Model
         'sender_id',
         'assign_person_ids',
         'title',
+        'item_id',
         'message',
         'is_read',
         'url',
@@ -49,9 +50,10 @@ class Notification extends Model
 
     public function markAllRead($id = null)
     {
-        $query = $this->where('assign_person_ids', Auth::id());
+        $query = $this->whereRaw('FIND_IN_SET(?, assign_person_ids)', [Auth::id()])
+            ->where('trash', 'NO');
 
-        if ($id != null) {
+        if (!empty($id) && is_numeric($id)) {
             $query->where('id', $id);
         }
 
@@ -59,9 +61,10 @@ class Notification extends Model
     }
 
 
+
     public function getAllNotification()
     {
-        return $this->where('assign_person_ids', Auth::id())->OrderBy("created_at","DESC")->get();
+        return $this->where('assign_person_ids', Auth::id())->OrderBy("created_at", "DESC")->get();
     }
 
     public function getAllUnreadNotification()

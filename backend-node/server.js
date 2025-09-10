@@ -6,6 +6,7 @@ const formidable = require('express-formidable');
 const http = require('http');
 const { Server } = require('socket.io');
 const ChatMessage = require('./model/ChatMessage');
+const { log } = require('console');
 
 dotenv.config();
 db.connectDB();
@@ -119,14 +120,14 @@ io.on("connection", (Socket) => {
 });
 
 app.post("/send-notification", (req, res) => {
-    const { id, sender_id, assign_person_ids, title, message, url, created_at } = req.fields;
+    const { id, sender_id, assign_person_ids, title, message, url, created_at, item_id } = req.fields;
 
     const recipients = Array.isArray(assign_person_ids) ? assign_person_ids : [assign_person_ids];
 
     recipients.forEach(userId => {
         const socketId = onlineUsers[userId];
         if (socketId) {
-            io.to(socketId).emit("notification", { id, title, message, url, created_at });
+            io.to(socketId).emit("notification", { id, title, message, url, created_at, item_id });
             console.log(`Sent notification to ${userId}`);
         }
     });

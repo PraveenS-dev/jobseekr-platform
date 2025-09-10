@@ -30,6 +30,7 @@ function AddJobs() {
         formData.append("salary", data.salary);
         formData.append("job_type", data.job_type);
         formData.append("created_by", user.id);
+        formData.append("created_by_name", user.name);
 
         try {
             await axios.post(`${import.meta.env.VITE_NODE_BASE_URL}/jobs/store`, formData);
@@ -85,9 +86,9 @@ function AddJobs() {
                             className="w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white px-4 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                         >
                             <option value="">Select Category</option>
-                            <option value="1">Software</option>
-                            <option value="2">Marketing</option>
-                            <option value="3">Design</option>
+                            <option value="Software">Software</option>
+                            <option value="Marketing">Marketing</option>
+                            <option value="Design">Design</option>
                         </select>
                         {errors.category_id && <p className="text-red-500 text-sm mt-1">{errors.category_id.message}</p>}
                     </div>
