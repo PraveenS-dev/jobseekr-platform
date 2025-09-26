@@ -28,7 +28,7 @@ const list = async (req, res) => {
         searchCondition.created_by = user_id;
     }
 
-    const jobDetails = await Jobs.find(searchCondition).sort({ timestamp: 1 }).skip(skip).limit(limit);
+    const jobDetails = await Jobs.find(searchCondition).sort({ created_at: -1 }).skip(skip).limit(limit);
     const total = await Jobs.countDocuments(searchCondition);
 
     res.json({

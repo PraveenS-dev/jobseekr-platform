@@ -291,6 +291,40 @@ class UserController extends BaseController
         }
     }
 
+    public function changeCoverimageMobile(Request $request)
+    {
+
+        try {
+            $id = decryptId($request->id);
+
+            $this->users->changeCoverimageMobile($id);
+
+            $success = [
+                'message' => "User updated"
+            ];
+            return $this->sendResponse($success, "Cover Image Successfuly Changed!");
+        } catch (Exception $ex) {
+            return $this->sendError('Unauthorised.', ['error' => $ex], 401);
+        }
+    }
+
+    public function changeProfileimageMobile(Request $request)
+    {
+
+        try {
+            $id = decryptId($request->id);
+
+            $this->users->changeProfileimageMobile($id);
+
+            $success = [
+                'message' => "User updated"
+            ];
+            return $this->sendResponse($success, "Profile Image Successfuly Changed!");
+        } catch (Exception $ex) {
+            return $this->sendError('Unauthorised.', ['error' => $ex], 401);
+        }
+    }
+
     public function userNameUnique(Request $request)
     {
         $id = $request->id;

@@ -16,6 +16,7 @@ use App\Http\Controllers\Admin\JobSeekr\ApplicationController;
 Route::middleware('api')->group(function () {
 
     Route::post('/login',    [AuthController::class, 'login']);
+    Route::post('/refreshToken',    [AuthController::class, 'refreshToken']);
     Route::post('/register', [AuthController::class, 'register']);
     Route::post('/users/userNameUnique', [UserController::class, 'userNameUnique']);
     Route::post('/users/emailUnique', [UserController::class, 'emailUnique']);
@@ -108,6 +109,9 @@ Route::middleware('api')->group(function () {
 
         Route::post('/users/changeCoverimage', [UserController::class, 'changeCoverimage']);
         Route::post('/users/changeProfileimage', [UserController::class, 'changeProfileimage']);
+
+        Route::post('/users/mobile/changeCoverimage', [UserController::class, 'changeCoverimageMobile']);
+        Route::post('/users/mobile/changeProfileimage', [UserController::class, 'changeProfileimageMobile']);
 
         // Connections
         Route::get('/users/connections', [AdminController::class, 'getConnections']);

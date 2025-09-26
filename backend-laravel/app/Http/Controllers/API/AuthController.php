@@ -67,9 +67,8 @@ class AuthController extends Controller
     {
         $credentials = $request->only('email', 'password');
 
-        // Check if user exists and get status
+        // Check if user exists
         $user = User::where('email', $credentials['email'])->first();
-
         if (!$user) {
             return response()->json(['error' => 'Invalid credentials'], 401);
         }
@@ -79,16 +78,51 @@ class AuthController extends Controller
             return response()->json(['error' => 'You are blocked by admin. Please contact support.'], 403);
         }
 
-        // Try to authenticate
+        // Try to authenticate first
         if (!$token = auth('api')->attempt($credentials)) {
-            return response()->json(['error' => 'Invalid credentials'], 401);
+            return response()->json(['error' => 'Invalid credentials!'], 401);
         }
 
-        return response()->json([
+        // Set TTL based on client type AFTER successful login
+        $clientType = $request->header('X-Client-Type');
+        $ttl = ($clientType === 'mobile') ? 60 * 24 * 30 : auth('api')->factory()->getTTL(); // 30 days vs default
+        auth('api')->factory()->setTTL($ttl);
+
+        // Regenerate token with new TTL for mobile
+        if ($clientType === 'mobile') {
+            $token = auth('api')->login($user); // ensures mobile gets long-lived token
+            $refreshToken = bin2hex(random_bytes(40));
+            $user->refresh_token = $refreshToken;
+            $user->save();
+        }
+
+        $responseData = [
             'access_token' => $token,
             'token_type'   => 'bearer',
             'expires_in'   => auth('api')->factory()->getTTL() * 60,
-            'user'         => auth('api')->user(),
+            'user'         => $user,
+        ];
+
+        if ($clientType === 'mobile') {
+            $responseData['refresh_token'] = $user->refresh_token;
+        }
+
+        return response()->json($responseData);
+    }
+
+
+
+    public function refreshToken(Request $request)
+    {
+        $refreshToken = $request->token;
+
+        $user = User::where('refresh_token', $refreshToken)->first();
+        if (!$user) return response()->json(['error' => 'Invalid refresh token'], 401);
+
+        $token = JWTAuth::fromUser($user);
+        return response()->json([
+            'accessToken' => $token,
+            'user' => $user
         ]);
     }
 

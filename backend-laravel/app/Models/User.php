@@ -248,6 +248,148 @@ class User extends Authenticatable implements JWTSubject
         return true;
     }
 
+    public function changeCoverimageMobile($id)
+    {
+        $request = request();
+        $user = User::findOrFail($id);
+
+        $disk = env('FILESYSTEM_DISK', 'public');
+        $upload_path = 'uploads/users/cover_images';
+
+        if ($request->image) {
+            $base64Image = $request->image;
+            $data = preg_replace('#^data:[a-z]+/[a-z0-9-]+;base64,#i', '', $base64Image);
+            $fileData = base64_decode($data);
+
+            $finfo = finfo_open();
+            $mimeType = finfo_buffer($finfo, $fileData, FILEINFO_MIME_TYPE);
+            finfo_close($finfo);
+
+            $validFormats = [
+                'image/jpeg',
+                'image/jpg',
+                'image/png',
+                'image/heic',
+                'image/heif',
+            ];
+
+            if (!in_array($mimeType, $validFormats)) {
+                return response()->json(['error' => 'Invalid file format'], 422);
+            }
+
+            $mimetypes = [
+                'image/jpeg' => 'jpeg',
+                'image/jpg'  => 'jpg',
+                'image/png'  => 'png',
+                'image/heic' => 'heic',
+                'image/heif' => 'heif',
+            ];
+
+            $extension = $mimetypes[$mimeType];
+            $filename = uniqid() . '_' . time() . '.' . $extension;
+            $path = $upload_path . '/' . $filename;
+
+            if ($user->cover_img_path) {
+                try {
+                    $oldFile = $disk === 's3'
+                        ? ltrim(parse_url($user->cover_img_path, PHP_URL_PATH), '/')
+                        : str_replace(asset('storage') . '/', '', $user->cover_img_path);
+
+                    Storage::disk($disk)->delete($oldFile);
+                } catch (\Exception $e) {
+                }
+            }
+
+            Storage::disk($disk)->put($path, $fileData, $disk === 's3' ? 'public' : null);
+
+            $cover_img_path = $disk === 's3'
+                ? Storage::disk('s3')->url($path)
+                : asset('storage/' . $path);
+        } else {
+            $cover_img_path = $user->cover_img_path;
+        }
+
+        $user->update([
+            'cover_img_path' => $cover_img_path,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'cover_img_path' => $cover_img_path,
+        ]);
+    }
+
+    public function changeProfileimageMobile($id)
+    {
+        $request = request();
+        $user = User::findOrFail($id);
+
+        $disk = env('FILESYSTEM_DISK', 'public');
+        $upload_path = 'uploads/users/profile_images';
+
+        if ($request->image) {
+            $base64Image = $request->image;
+            $data = preg_replace('#^data:[a-z]+/[a-z0-9-]+;base64,#i', '', $base64Image);
+            $fileData = base64_decode($data);
+
+            $finfo = finfo_open();
+            $mimeType = finfo_buffer($finfo, $fileData, FILEINFO_MIME_TYPE);
+            finfo_close($finfo);
+
+            $validFormats = [
+                'image/jpeg',
+                'image/jpg',
+                'image/png',
+                'image/heic',
+                'image/heif',
+            ];
+
+            if (!in_array($mimeType, $validFormats)) {
+                return response()->json(['error' => 'Invalid file format'], 422);
+            }
+
+            $mimetypes = [
+                'image/jpeg' => 'jpeg',
+                'image/jpg'  => 'jpg',
+                'image/png'  => 'png',
+                'image/heic' => 'heic',
+                'image/heif' => 'heif',
+            ];
+
+            $extension = $mimetypes[$mimeType];
+            $filename = uniqid() . '_' . time() . '.' . $extension;
+            $path = $upload_path . '/' . $filename;
+
+            if ($user->profile_path) {
+                try {
+                    $oldFile = $disk === 's3'
+                        ? ltrim(parse_url($user->profile_path, PHP_URL_PATH), '/')
+                        : str_replace(asset('storage') . '/', '', $user->profile_path);
+
+                    Storage::disk($disk)->delete($oldFile);
+                } catch (\Exception $e) {
+                }
+            }
+
+            Storage::disk($disk)->put($path, $fileData, $disk === 's3' ? 'public' : null);
+
+            $profile_path = $disk === 's3'
+                ? Storage::disk('s3')->url($path)
+                : asset('storage/' . $path);
+        } else {
+            $profile_path = $user->profile_path;
+        }
+
+        $user->update([
+            'profile_path' => $profile_path,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'profile_path' => $profile_path,
+        ]);
+    }
+
     public function SelectOne($id)
     {
 
