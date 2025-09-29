@@ -90,11 +90,14 @@ class AuthController extends Controller
 
         // Regenerate token with new TTL for mobile
         if ($clientType === 'mobile') {
-            $token = auth('api')->login($user); // ensures mobile gets long-lived token
-            $refreshToken = bin2hex(random_bytes(40));
-            $user->refresh_token = $refreshToken;
-            $user->save();
+            if (!$user->refresh_token) {
+                $refreshToken = bin2hex(random_bytes(40));
+                $user->refresh_token = $refreshToken;
+                $user->save();
+            }
+            $responseData['refresh_token'] = $user->refresh_token;
         }
+
 
         $responseData = [
             'access_token' => $token,
